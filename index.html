@@ -6,70 +6,125 @@
         integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
 
     <style>
-        .abilityList {
-            display: grid;
-            grid-template-columns: 50px 300px 100px 100px;
+        @import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@800&display=swap');
+
+        body {
+            background: black;
+            color: white;
         }
-        .abilityRow {
+
+        #abilityList {
             display: grid;
-            grid-template-columns: 100px 400px 150px 150px;
+            grid-template-columns: 50px 300px 150px 150px;
+            background-image: url('img/mirror.png');
+            background-repeat: no-repeat;
+            background-size: 1400px 1080px;
+            padding-top: 350px;
+            padding-left: 350px;
+
         }
-        .abilityCost, .abilityBenefit, .abilityName {
-            margin-left: 10px;
-            font-weight: bold;
+
+        #switches,
+        #names,
+        #benefits,
+        #costs {
+            display: flex;
+            flex-direction: column;
+            align-content: flex-start;
+            justify-content: left;
+            align-items: center;
+            font-family: 'Alegreya Sans', sans-serif;
+            font-variant: small-caps;
+            font-size: 28px;
+        }
+
+        #names:first-letter {
+            font-size: 24px;
+        }
+
+        #switches div,
+        #names div,
+        #benefits div,
+        #costs div {
+            margin-bottom: 11px;
+            height: 34px;
             display: flex;
             justify-content: left;
             align-items: center;
         }
 
-        .a .abilityName {
-            color: rgb(230, 161, 161);
+        #switches div {
+            width: 50px;
         }
-        
-        .b .abilityName {
-            color: rgb(159, 247, 159);
+
+        #names div {
+            width: 230px;
         }
-        .a, .b {
-            display: grid;
-            grid-template-columns: 200px 100px 100px;
+
+        #benefits div {
+            width: 150px;
         }
-        
+
+        #costs div {
+            width: 150px;
+        }
+
+        #names .a {
+            color: #fe503c;
+        }
+
+        #names .b {
+            color: #cdfb36;
+        }
+
         #remaining {
             display: none;
+        }
+
+        img {
+            box-shadow: 0px 0px 10px 5px #160f1b;
+            margin-right: 10px;
+        }
+
+        .shadowcrystal {
+            width: 28px;
+            height: 32px;
+            display: inline-block;
+            background-image: url('img/shadowcrystal.png');
+            vertical-align: middle;
         }
     </style>
     <script src="abilities.js"></script>
 </head>
 
 <body>
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
             <div class="col">
                 <h1>Hades Ability Calculator</h1>
 
                 <div class="abilityContainer">
-                    <div id="starting">
+                    <div id="starting" class="mb-3">
                         Starting amount:<br><input id="startingAmount" type="text">
                     </div>
-                    <div class="abilityList">
+                    <div id="abilityList">
                         <div id="switches"></div>
-                        <div id="names">test</div>
-                        <div id="benefits">test</div>
-                        <div id="costs">test</div>
+                        <div id="names"></div>
+                        <div id="benefits"></div>
+                        <div id="costs"></div>
+                    </div>
+                    <div id="totalCost">
+                        Total Cost: <span id="totalCostAmount">0</span>
+                    </div>
+                    <div id="remaining">
+                        Remaining: <span id="remainingAmount">0</span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                Total Cost: <span id="totalCost">0</span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div id="remaining">
-                    Remaining: <span id="remainingAmount">0</span>
-                </div>
+
             </div>
         </div>
     </div>
@@ -82,163 +137,159 @@
 
     <script>
         $(function () {
-            addSwitchButtons(ABILITY_DATA[0]);
-
-            $('#startingAmount').keyup(function() {
-                if ($(this).val() != '') {
-                    $('#remaining').show();
-                    let startingAmount = Number.parseInt($(this).val());
-                    let costAmount = Number.parseInt($('#totalCost').text());
-
-                    $('#remainingAmount').text(startingAmount - costAmount);
-                } else {
-                    $('#remaining').hide();
-                }
-            });
-
-            for (row of ABILITY_DATA) {
-                addSwitchButtons(row);
-                buildRow(row);
-            }
-
-            $('.b').each(function() {
-                $(this).hide();
-            });
+            init();
         });
 
-        function resetRow(rowNum) {
-            let abilityA = '#row-' + rowNum + ' .a';
-            let abilityB = '#row-' + rowNum + ' .b';
-            $(abilityA).toggle();
-            $(abilityB).toggle();
+        function init() {
+            for (item of ABILITY_DATA) {
+                addSwitchButtons(item);
+                addAbilities(item.row, 'a', item.a);
+                addAbilities(item.row, 'b', item.b);
+            }
 
-            $('#row-' + rowNum + ' input').each(function (i, e) {
-                $(this).prop('checked', false);
-            });
-
-            $(`#${rowNum}-a-00`).prop('checked', true);
-            $(`#${rowNum}-b-00`).prop('checked', true);
-            $(`#${rowNum}-a-max`).hide();
-            $(`#${rowNum}-b-max`).hide();
-
-            $('#cost-' + rowNum).text('0');
-            $('#benefit-' + rowNum).text('0');
-            calculateTotalCost();
-        }
-
-        function calculateTotalCost() {
-            let totalAmount = 0;
-            $('input:checked').each(function () {
-                totalAmount += Number.parseInt($(this).val());
-            });
-            $('#totalCost').text(totalAmount);
+            $('.b').hide();
         }
 
         function addSwitchButtons(data) {
-            let switchImage = `<img src="img/button-switch.png" id="switch-${data.row}" data-row=${data.row} />`;
+            let switchButton = $('<img>')
+                .attr({
+                    src: `img/button-switch.png`,
+                    "data-row": data.row
+                }).click(handleSwitchOption);
 
-            $('img').appendTo($('#switches'));
-
-            //         .attr({
-            //             id: `switch-${data.row}`,
-            //             'data-row': data.row,
-            //             src: 'img/button-switch.png'
-            //         }).click(function (e) {
-            //             resetRow(e.currentTarget.dataset['row']);
-            //         }
-            //     )
-            // );
+            $('#switches').append($('<div>').append(switchButton));
         }
 
-        function buildRow(data) {
-            let abilityRow = $('<div>').attr({
-                class: 'abilityRow',
-                id: `row-${data.row}`
+        function handleSwitchOption(event) {
+            let row = $(event.currentTarget).attr('data-row');
+
+            $(`.b[data-row='${row}'], .a[data-row='${row}']`).toggle();
+
+            handleUpdateTotalCost();
+            $('#startingAmount').trigger('keyup');
+        }
+
+        function addAbilities(row, option, data) {
+            let name = $('<div>').addClass(option)
+                .attr({
+                    'data-row': row,
+                    'data-option': option
+                }).text(data.name);
+
+            $('#names').append(name);
+
+            let rankValue = $('<input>')
+                .attr({
+                    type: 'hidden',
+                    'data-row': row,
+                    'data-option': option,
+                    'data-length': data.ranks.length
+                }).val(0);
+
+            let addButton = $('<img>')
+                .attr({
+                    src: `img/button-add.png`,
+                    'data-row': row,
+                    'data-option': option
+                }).click(handleAddRank);
+
+            let costWrapper = $('<div>').addClass(option).attr({
+                'data-row': row,
+                'data-option': option
+            }).append(rankValue).append(addButton);
+
+            let benefitWrapper = $('<div>').addClass(option).attr({
+                'data-row': row,
+                'data-option': option
             });
 
-            abilityRow
-                .append(buildAbility(data.a, data.row, 'a'))
-                .append(buildAbility(data.b, data.row, 'b'))
-                .append($('<div>').addClass('abilityCost').html(`<span id="cost-${data.row}">Cost: 0</span>`))
-                .append($('<div>').addClass('abilityBenefit').html(`<span id="benefit-${data.row}">Benefit: 0</span>`));
+            for (var i = 0; i < data.ranks.length; i++) {
+                let benefitLabel = $('<span>').addClass('benefit')
+                    .attr({
+                        'data-row': row,
+                        'data-option': option,
+                        'data-rank': i
+                    }).text(data.ranks[i].benefit).hide();
 
-            $('.abilityList').append(abilityRow);
-        }
+                let shadowCrystal = $('<span>').addClass('shadowcrystal');
 
-        function buildAbility(data, row, option) {
-            let ability = $('<div>').addClass(option);
-            ability.append($('<span>').addClass('abilityName').text(data.name));
-            let count = 0;
+                let costLabelValue = data.ranks[i].costNext == '0' ? 'MAX' : data.ranks[i].costNext;
 
-            for (rank of data.ranks) {
-                let formCheck = $('<div>').addClass('form-check-inline');
-                let rankNumber = count.toString().padStart(2, '0');
-
-                let input = $('<input>').attr({
-                    type: 'radio',
-                    value: rank.costTotal,
-                    class: 'form-check-input',
-                    name: `${row}-${option}`,
-                    id: `${row}-${option}-${rankNumber}`
-                }).click(function () {
-                    let rowNum = $(this).attr('name').substr(0, 2);
-                    let thisID = $(this).attr('id');
-
-                    $('#cost-' + rowNum).text(`Cost: ${$(this).val()}`);
-                    $('#benefit-' + rowNum).text(`Benefit: ${$('label[for="' + thisID + '"]').text()}`);
-                    calculateTotalCost();
-
-                    let nextNum = Number.parseInt(thisID.substr(thisID.length - 2)) + 1;
-                    nextNum = nextNum.toString().padStart(2, '0');
-
-                    let nextRankMaybe = '#' + thisID.substr(0, thisID.length - 2) + nextNum;
-                    let max = $(`#${rowNum}-${option}-max`);
-
-                    if ($(nextRankMaybe).length != 0) {
-                        max.hide();
-                    } else {
-                        max.show();
-                    }
-
-                    $('#startingAmount').trigger('keyup');
-                });
-
-                input.val() == "0" ? input.attr('checked', true) : input.attr('checked', false);
-
-                let label = $('<label>').attr({
-                    class: 'form-check-label',
-                    for: `${row}-${option}-${rankNumber}`
-                }).text(rank.costLabel);
-
-                formCheck.append(input).append(label).attr('style', 'display: none;');
-                ability.append(formCheck);
-                count++;
+                let costLabel = $('<span>').addClass('cost')
+                    .attr({
+                        'data-row': row,
+                        'data-option': option,
+                        'data-rank': i,
+                        'data-max-rank': data.ranks.length
+                    }).text(costLabelValue).append(shadowCrystal).hide();
+                if (i == 0) {
+                    costLabel.show();
+                    benefitLabel.show();
+                }
+                costWrapper.append(costLabel);
+                benefitWrapper.append(benefitLabel);
             }
 
-            let addButton = $('img').attr({
-                src: 'img/button-add.png',
-                id: `${row}-${option}-add`
-            }).click(function (e) {
-                let inputs = $(`input[name="${row}-${option}"]`);
+            $('#costs').append(costWrapper);
+            $('#benefits').append(benefitWrapper);
+        }
 
-                for (let i = 0; i < inputs.length; i++) {
-                    if (inputs[i].checked == true) {
-                        $(inputs[i]).attr('checked', false);
+        function handleAddRank(event) {
+            let row = $(event.currentTarget).attr('data-row');
+            let option = $(event.currentTarget).attr('data-option');
+            let hiddenInput = $(`input[data-row=${row}][data-option=${option}]`);
 
-                        if (i == inputs.length - 1) {
-                            $(inputs[0]).attr('checked', true).trigger('click');
-                            return;
-                        } else {
-                            $(inputs[i + 1]).attr('checked', true).trigger('click');
-                            return;
-                        }
-                    }
-                }
+            let value = Number.parseInt(hiddenInput.val());
+            let length = Number.parseInt(hiddenInput.attr('data-length'));
+
+            if (value < length - 1) {
+                hiddenInput.val(value + 1);
+                $(`span[data-row=${row}][data-option=${option}][data-rank=${value}]`).hide();
+                $(`span[data-row=${row}][data-option=${option}][data-rank=${value + 1}]`).show();
+            } else {
+                hiddenInput.val(0);
+                $(`span[data-row=${row}][data-option=${option}][data-rank=${value}]`).hide();
+                $(`span[data-row=${row}][data-option=${option}][data-rank=0]`).show();
+            }
+
+            handleUpdateTotalCost();
+            $('#startingAmount').trigger('keyup');
+        }
+
+        function handleUpdateTotalCost() {
+            let totalAmount = 0;
+            let currentCosts = $('#costs div:visible input[type=hidden]');
+            console.log(`found ${currentCosts.length} hidden inputs`);
+
+            currentCosts.each(function (i, e) {
+                let row = $(e).attr('data-row');
+                let option = $(e).attr('data-option');
+                let rank = $(e).val();
+                let max = $(e).attr('data-max-rank');
+                
+
+                let valueToAdd = $(`#costs div span[data-row=${row}][data-option=${option}][data-rank=${rank}]`).text();
+                console.log('to add: ' + valueToAdd);
+
+                totalAmount += Number.parseInt(valueToAdd);
+                console.log('total:' + totalAmount);
             });
 
-            ability.append(addButton).append($('<div>').attr('id', `${row}-${option}-max`).text('MAX').hide());;
+            $('#totalCostAmount').text(totalAmount);
+        }
 
-            return ability;
+        $('#startingAmount').keyup(handleStartingAmountChange);
+
+        function handleStartingAmountChange() {
+            if ($(this).val() != '') {
+                $('#remaining').show();
+                let startingAmount = Number.parseInt($(this).val());
+                let costAmount = Number.parseInt($('#totalCostAmount').text());
+
+                $('#remainingAmount').text(startingAmount - costAmount);
+            } else {
+                $('#remaining').hide();
+            }
         }
     </script>
 </body>
