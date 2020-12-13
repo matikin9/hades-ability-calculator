@@ -147,5 +147,37 @@ const ABILITY_DATA = [
                 }
             ]
         }
+    }, {
+        row: '04',
+        a: {
+            name: 'Greater Reflex',
+            description: 'Each rank lets you chain +1 Dash before briefly recovering.',
+            ranks: [
+                {
+                    costNext: 50,
+                    costTotal: 0,
+                    benefit: '0'
+                }, {
+                    costNext: 0,
+                    costTotal: 50,
+                    benefit: '1'
+                }
+            ]
+        },
+        b: {
+            name: 'Ruthless Reflex',
+            description: 'If you Dash just before getting hit, gain +50% damage and dodge chance for 2 Sec.',
+            ranks: [
+                {
+                    costNext: 75,
+                    costTotal: 0,
+                    benefit: 0
+                }, {
+                    costNext: 0,
+                    costTotal: 75,
+                    benefit: 1
+                }
+            ]
+        }
     }
 ];
